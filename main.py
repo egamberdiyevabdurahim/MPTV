@@ -18,7 +18,8 @@ user_model = UserModel()
 @router.message(CommandStart())
 async def start_command(message: types.Message, user=None, state: FSMContext = None, delete=True):
     # Clear state if provided
-    await state.clear()
+    if state:
+        await state.clear()
 
     if delete:
         await message.delete()

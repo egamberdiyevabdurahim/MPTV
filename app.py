@@ -1,6 +1,3 @@
-import logging
-logging.basicConfig(level=logging.INFO)
-
 import asyncio
 import schedule
 from aiogram import Bot, Dispatcher, types
@@ -97,7 +94,7 @@ async def main():
 
 async def init():
     # Schedule the task using an async lambda to avoid blocking
-    schedule.every().day.at("19:12").do(lambda: asyncio.create_task(dump_and_send()))
+    schedule.every().day.at("00:00").do(lambda: asyncio.create_task(dump_and_send()))
 
     # Run polling and schedule task concurrently
     await asyncio.gather(main(), schedule_task_for_inactivate())
@@ -105,5 +102,5 @@ async def init():
 if __name__ == '__main__':
     try:
         asyncio.run(init())  # Start the async event loop
-    except Exception as e:
-        logging.error(f"Error starting bot: {e}")
+    except Exception:
+        pass
