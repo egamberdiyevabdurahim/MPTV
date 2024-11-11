@@ -1,15 +1,17 @@
 from datetime import datetime, timedelta
 
-from aiogram import types, Router
+from aiogram import types, Router, Bot
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 
 from buttons.for_admin import main_menu_admin
 from buttons.for_user import main_menu_auth, main_menu_un_auth
+from database_config.config import TOKEN, GROUP_ID
 from queries.for_account import AccountModel
 from queries.for_user import UserModel
 
 router = Router()
+bot = Bot(token=TOKEN)
 
 account_model = AccountModel()
 user_model = UserModel()
@@ -53,6 +55,11 @@ async def start_command(message: types.Message, user=None, state: FSMContext = N
             account_model.add_used(account['id'])
 
         else:
+            await bot.send_message(chat_id=GROUP_ID, text=f"Yangi Botga start bergan foydalanuvchi:"
+                                                          f"Ismi: {user.first_name}\n"
+                                                          f"Familiyasi: {user.last_name if user.last_name else 'Mavjud Emasta'}\n"
+                                                          f"Telegram ID: {user.id}\n"
+                                                          f"Telegram Username: {user.username if user.username else 'Mavjud Emas'}")
             account_model.create_account(
                 first_name=user.first_name,
                 telegram_id=user.id,
