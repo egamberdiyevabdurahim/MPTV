@@ -38,8 +38,7 @@ async def add_language_name(message: types.Message, state: FSMContext):
 
     language_model.create_language(name=language_name)
     await message.answer("Til qushildi!")
-    await state.clear()
-    await start_command(message, user=message.from_user)
+    await movies_management(message=message, state=state)
 
 
 @router_for_language_management.callback_query(F.data == "delete_language")
@@ -68,8 +67,7 @@ async def delete_language_name(message: types.Message, state: FSMContext):
 
     language_model.delete_language(language_id=language['id'])
     await message.answer("Til o'chirildi!")
-    await state.clear()
-    await start_command(message, user=message.from_user)
+    await movies_management(message=message, state=state)
 
 
 @router_for_language_management.callback_query(F.data == "show_all_languages")

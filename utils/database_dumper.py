@@ -7,7 +7,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import FSInputFile
 
 from database_config.config import GROUP_ID, DB_USER, DB_NAME, TOKEN, DB_HOST, DB_PORT, DB_PASS
-from utils.additions import BASE_PATH
+from utils.additions import BASE_PATH, tashkent_time
 
 DUMP_PATH = f'{BASE_PATH}/database.sql'
 
@@ -20,7 +20,7 @@ async def send_dump_to_telegram():
         document = FSInputFile(DUMP_PATH)
         try:
             await bot.send_document(chat_id=GROUP_ID, document=document,
-                                    caption=datetime.now().strftime("%Y-%m-%d %H:%M"))
+                                    caption=tashkent_time.strftime("%Y-%m-%d %H:%M"))
         except Exception as e:
             await bot.send_message(text=f"Error sending file: {str(e)}", chat_id=GROUP_ID)
 

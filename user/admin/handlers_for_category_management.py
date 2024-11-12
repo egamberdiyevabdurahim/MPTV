@@ -38,7 +38,6 @@ async def add_category_name(message: types.Message, state: FSMContext):
 
     category_model.create_category(name=category_name)
     await message.answer("Categoriya qushildi!")
-    await state.clear()
     await movies_management(message=message, state=state)
 
 
@@ -68,7 +67,6 @@ async def delete_category_name(message: types.Message, state: FSMContext):
 
     category_model.delete_category(category_id=category['id'])
     await message.answer("Categoriya o'chirildi!")
-    await state.clear()
     await movies_management(message=message, state=state)
 
 

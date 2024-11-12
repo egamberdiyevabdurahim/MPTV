@@ -9,6 +9,7 @@ from buttons.for_user import main_menu_auth, main_menu_un_auth
 from database_config.config import TOKEN, GROUP_ID
 from queries.for_account import AccountModel
 from queries.for_user import UserModel
+from utils.additions import ADMIN_LINK, ADMIN_EMAIL
 
 router = Router()
 bot = Bot(token=TOKEN)
@@ -78,3 +79,35 @@ async def statistics_command(message: types.Message):
     text_data = (f"MP TV botimizda 1 oy ichida yangi qo'shilganlar soni: {total_accounts_in_month}\n"
                  f"MP TV botimizdagi umumiy foydalanuvchilar soni: {total_accounts}")
     await message.answer(text=text_data)
+
+
+@router.message(Command("dev"))
+async def dev_command(message: types.Message):
+    await message.answer(f"""
+🖥 Dasturchi haqida 🖥
+    
+Ushbu Telegram botni yasagan {ADMIN_LINK} — tajribali va malakali dasturchi.
+U har qanday murakkab dasturiy loyihalarni yaratish va texnik yechimlarni taklif etishda keng tajribaga ega.
+    
+{ADMIN_LINK} dasturchi, sizga quyidagi xizmatlarni taklif qiladi:
+
+Telegram botlar (maxsus, avtomatlashtirilgan tizimlar)
+Veb ilovalar va saytlar
+Mobil ilovalar
+Maxsus dasturiy yechimlar va tizimlar
+API integratsiyalari
+
+💼 Xizmatlar:
+
+Telegram botlar va kanal boshqaruvi
+Veb ilovalar va saytlar ishlab chiqish
+Mobil ilovalar yaratish
+Dasturiy integratsiyalar va maxsus yechimlar
+
+📞 Bog‘lanish uchun:
+
+Telegram: {ADMIN_LINK}
+Email: {ADMIN_EMAIL}
+GitHub: github.com/egamberdiyevabdurahim
+🔧 Loyihangizni mukammal qilish uchun yordam berishga tayyorman!
+""")

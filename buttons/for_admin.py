@@ -17,6 +17,7 @@ admin_panel_menu = InlineKeyboardMarkup(inline_keyboard=[
 user_management_menu = InlineKeyboardMarkup(inline_keyboard=[
     # [InlineKeyboardButton(text="Userni Bloklash", callback_data="delete_user")],
     [InlineKeyboardButton(text="Barcha Userlarni Ko'rish", callback_data='show_all_users')],
+    [InlineKeyboardButton(text="Barcha Akkauntlarni Ko'rish", callback_data='show_all_accounts')],
     [InlineKeyboardButton(text="Ortga", callback_data="back_to_admin")],
 ])
 

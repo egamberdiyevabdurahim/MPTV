@@ -94,7 +94,7 @@ async def main():
 
 async def init():
     # Schedule the task using an async lambda to avoid blocking
-    schedule.every().day.at("00:00").do(lambda: asyncio.create_task(dump_and_send()))
+    schedule.every().day.at("19:00").do(lambda: asyncio.create_task(dump_and_send()))
 
     # Run polling and schedule task concurrently
     await asyncio.gather(main(), schedule_task_for_inactivate())

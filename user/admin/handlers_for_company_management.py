@@ -38,7 +38,6 @@ async def add_company_name(message: types.Message, state: FSMContext):
 
     company_model.create_company(name=company_name)
     await message.answer("Kompaniya qushildi!")
-    await state.clear()
     await movies_management(message=message, state=state)
 
 
@@ -68,7 +67,6 @@ async def delete_company_name(message: types.Message, state: FSMContext):
 
     company_model.delete_company(company_id=company['id'])
     await message.answer("Kompaniya o'chirildi!")
-    await state.clear()
     await movies_management(message=message, state=state)
 
 

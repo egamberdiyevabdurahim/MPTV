@@ -461,7 +461,7 @@ async def delete_movie_validate(call: types.CallbackQuery, state: FSMContext):
     else:
         await call.message.answer("Filmi o'chirishni bekor qilindi!")
 
-    await movies_management(message=call.message, state=state, delete=False)
+    await movies_management(call=call, state=state, delete=False)
 
 
 @router_for_movie_management.callback_query(F.data == "show_all_movies")
@@ -475,9 +475,9 @@ async def show_all_movies(call: types.CallbackQuery):
 
     if not movies:
         await call.message.answer("Filmlar topilmadi!")
-        await movies_management(message=call.message, delete=False)
+        await movies_management(call=call, delete=False)
         return
 
     text = "\n".join([f"{movie['code']}. {movie['title']}" for movie in movies])
     await call.message.answer(text)
-    await movies_management(message=call.message, delete=False)
+    await movies_management(call=call, delete=False)

@@ -45,3 +45,33 @@ async def show_all_users(call: types.CallbackQuery):
         file = FSInputFile(user_file_path)
         await call.message.answer_document(document=file, reply_markup=back_button)
         os.remove(user_file_path)
+    return None
+
+
+@router_for_user_management.callback_query(F.data == 'show_all_accounts')
+async def show_all_accounts(call: types.CallbackQuery):
+    await call.answer()
+    await call.message.delete()
+    user_file_path = os.path.join(BASE_PATH, "accounts.txt")
+
+    accounts = account_model.get_all_accounts()
+    with open(user_file_path, "w") as f:
+        for account in accounts:
+            last_name = account['last_name'] or "Mavjud Emas"
+            accounts_data = (f"ID: {account['id']}\n"
+                         f"Telegram ID: {account['telegram_id']}\n"
+                         f"First Name: {account['first_name']}\n"
+                         f"Last Name: {last_name}\n"
+                         f"Telegram Username: @{account['telegram_username']}\n"
+                         f"User ID: {account['user_id']}\n"
+                         f"Used: {account['used']}\n"
+                         f"Created At: {account['created_at']}\n"
+                         f"Updated At: {account['updated_at']}\n"
+                         f"{'-' * 25}\n")
+            f.write(accounts_data)
+
+    if os.path.exists(user_file_path):
+        file = FSInputFile(user_file_path)
+        await call.message.answer_document(document=file, reply_markup=back_button)
+        os.remove(user_file_path)
+    return None

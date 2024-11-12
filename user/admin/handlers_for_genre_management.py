@@ -38,8 +38,7 @@ async def add_genre_name(message: types.Message, state: FSMContext):
 
     genre_model.create_genre(name=genre_name)
     await message.answer("Janr qushildi!")
-    await state.clear()
-    await start_command(message, user=message.from_user)
+    await movies_management(message=message, state=state)
 
 
 @router_for_genre_management.callback_query(F.data == "delete_genre")
@@ -68,8 +67,7 @@ async def delete_genre_name(message: types.Message, state: FSMContext):
 
     genre_model.delete_genre(genre_id=genre['id'])
     await message.answer("Janr o'chirildi!")
-    await state.clear()
-    await start_command(message, user=message.from_user)
+    await movies_management(message=message, state=state)
 
 
 @router_for_genre_management.callback_query(F.data == "show_all_genres")

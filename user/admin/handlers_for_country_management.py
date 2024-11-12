@@ -37,7 +37,6 @@ async def add_country_name(message: types.Message, state: FSMContext):
 
     country_model.create_country(name=country_name)
     await message.answer("Davlat qushildi!")
-    await state.clear()
     await movies_management(message=message, state=state)
 
 
@@ -67,7 +66,6 @@ async def delete_country_name(message: types.Message, state: FSMContext):
 
     country_model.delete_country(country_id=country['id'])
     await message.answer("Davlat o'chirildi!")
-    await state.clear()
     await movies_management(message=message, state=state)
 
 
