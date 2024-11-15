@@ -9,7 +9,6 @@ from aiogram.types import InputMediaPhoto, InputMediaVideo, ReplyKeyboardRemove
 
 from buttons.for_admin import skip_menu
 from database_config.config import TOKEN
-from main import start_command
 from queries.for_account import AccountModel
 from states.for_admin import SendingMessageAdmin
 from utils.validator import my_validator
@@ -18,6 +17,31 @@ router_for_sending_message = Router()
 bot = Bot(token=TOKEN)
 
 account_model = AccountModel()
+
+
+def retry_on_disconnect(func):
+    async def wrapper(*args, **kwargs):
+        retries = 3
+        delay = 5
+        for attempt in range(retries):
+            try:
+                return await func(*args, **kwargs)
+            except aiohttp.client_exceptions.ServerDisconnectedError as e:
+                print(f"Attempt {attempt + 1}/{retries} failed: {e}. Retrying...")
+                if attempt < retries - 1:
+                    time.sleep(delay)
+                else:
+                    raise e
+
+    return wrapper
+
+
+def run_async_in_thread(async_func, *args, **kwargs):
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(async_func(*args, **kwargs))
+    loop.close()
+    return None
 
 
 @router_for_sending_message.callback_query(F.data == "send_message")
@@ -44,7 +68,7 @@ async def send_message_admin_message(message: types.Message, state: FSMContext):
 
 
     await state.update_data(message=message.text)
-    await message.answer("Rasm yoki video jo'nating:\n", reply_markup=skip_menu)
+    await message.answer("Rasm yoki video jo'nating:", reply_markup=skip_menu)
     await state.set_state(SendingMessageAdmin.photo)
 
 
@@ -81,33 +105,9 @@ async def send_message_admin_photo(message: types.Message, state: FSMContext):
 
         await message.answer("Video added. Send another video/photo or type 'Done' when finished.")
 
-    elif message.text and message.text.lower() == 'done':
+    elif message.text and message.text.lower() == 'done' or message.text.lower() == 'skip':
         data = await state.get_data()
         await state.clear()
-
-        # Retry decorator to handle server disconnections
-        def retry_on_disconnect(func):
-            async def wrapper(*args, **kwargs):
-                retries = 3  # Retry limit
-                delay = 5  # Delay between retries in seconds
-                for attempt in range(retries):
-                    try:
-                        return await func(*args, **kwargs)
-                    except aiohttp.client_exceptions.ServerDisconnectedError as e:
-                        print(f"Attempt {attempt + 1}/{retries} failed: {e}. Retrying...")
-                        if attempt < retries - 1:
-                            time.sleep(delay)  # Wait before retrying
-                        else:
-                            raise e
-
-            return wrapper
-
-        # Function to run an async function in a separate thread
-        def run_async_in_thread(async_func, *args, **kwargs):
-            loop = asyncio.new_event_loop()  # Create a new event loop
-            asyncio.set_event_loop(loop)  # Set the new loop as the current loop for this thread
-            loop.run_until_complete(async_func(*args, **kwargs))  # Run the async function
-            loop.close()  # Close the event loop after execution
 
         thread = threading.Thread(target=run_async_in_thread, args=(add_end, message, data))
         thread.start()
@@ -119,25 +119,29 @@ async def send_message_admin_photo(message: types.Message, state: FSMContext):
 
 async def add_end(message: types.Message, data):
     message_for_sending = data.get('message')
-    photos = data.get('photos', [])
-    videos = data.get('videos', [])
+    photos = data.get('photos', '0')
+    videos = data.get('videos', '0')
 
     media_group = []
-    for photo in photos:
-        media_group.append(InputMediaPhoto(media=photo))
-    for video in videos:
-        media_group.append(InputMediaVideo(media=video))
+    if photos != '0' and videos != '0':
+        for photo in photos:
+            media_group.append(InputMediaPhoto(media=photo))
+        for video in videos:
+            media_group.append(InputMediaVideo(media=video))
 
-    if media_group and message_for_sending:
-        media_group[0].caption = message_for_sending
-        media_group[0].parse_mode = "HTML"
+        if media_group and message_for_sending:
+            media_group[0].caption = message_for_sending
+            media_group[0].parse_mode = "HTML"
 
     accounts = account_model.get_all_accounts()
     for account in accounts:
-        print(account)
         telegram_id = account.get('telegram_id')
         try:
-            await bot.send_media_group(chat_id=telegram_id, media=media_group)
+            if len(media_group) > 0:
+                await bot.send_media_group(chat_id=telegram_id, media=media_group)
+
+            else:
+                await bot.send_message(chat_id=telegram_id, text=message_for_sending, parse_mode="HTML")
             await asyncio.sleep(0.002)
         except Exception as e:
             print(f"Failed to send media to {telegram_id}: {e}")
