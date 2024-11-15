@@ -42,7 +42,6 @@ async def send_message_admin_message(message: types.Message, state: FSMContext):
         await message.answer("Xabarni kiriting!")
         return
 
-    print(message.text)
 
     await state.update_data(message=message.text)
     await message.answer("Rasm yoki video jo'nating:\n", reply_markup=skip_menu)
@@ -134,7 +133,6 @@ async def add_end(message: types.Message, data):
         media_group[0].parse_mode = "HTML"
 
     accounts = account_model.get_all_accounts()
-    print(accounts)
     for account in accounts:
         print(account)
         telegram_id = account.get('telegram_id')
