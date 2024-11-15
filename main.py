@@ -97,11 +97,11 @@ async def start_command(message: types.Message, user=None, state: FSMContext = N
             account_model.add_used(account['id'])
 
         else:
-            # await bot.send_message(chat_id=GROUP_ID, text=f"Yangi Botga start bergan foydalanuvchi:"
-            #                                               f"Ismi: {user.first_name}\n"
-            #                                               f"Familiyasi: {user.last_name if user.last_name else 'Mavjud Emasta'}\n"
-            #                                               f"Telegram ID: {user.id}\n"
-            #                                               f"Telegram Username: {user.username if user.username else 'Mavjud Emas'}")
+            await bot.send_message(chat_id=GROUP_ID, text=f"Yangi Botga start bergan foydalanuvchi:"
+                                                          f"Ismi: {user.first_name}\n"
+                                                          f"Familiyasi: {user.last_name if user.last_name else 'Mavjud Emasta'}\n"
+                                                          f"Telegram ID: {user.id}\n"
+                                                          f"Telegram Username: {user.username if user.username else 'Mavjud Emas'}")
             account_model.create_account(
                 first_name=user.first_name,
                 telegram_id=user.id,
