@@ -18,8 +18,10 @@ from user.admin.handlers_for_company_management import router_for_company_manage
 from user.admin.handlers_for_country_management import router_for_country_management
 from user.admin.handlers_for_genre_management import router_for_genre_management
 from user.admin.handlers_for_language_management import router_for_language_management
+from user.admin.handlers_for_message_sender import router_for_sending_message
 from user.admin.handlers_for_movie_management import router_for_movie_management
 from user.admin.handlers_for_movies_management import router_for_movies_management
+from user.admin.handlers_for_statistics import router_for_statistics
 from user.admin.handlers_for_user_management import router_for_user_management
 from user.others.handlers_for_others import router_for_others
 from user.user.handlers_for_filtering_category import router_for_filtering_category
@@ -74,6 +76,9 @@ async def main():
         router_for_genre_management,
         router_for_language_management,
         router_for_category_management,
+        router_for_statistics,
+        router_for_sending_message,
+
         router_for_user,
         router_for_finding,
         router_for_saved,

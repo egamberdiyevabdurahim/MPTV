@@ -2,10 +2,11 @@ from database_config.db_settings import execute_query
 
 
 class AccountModel:
-    @staticmethod
-    def create_account_table():
-        query = """
-        CREATE TABLE IF NOT EXISTS account (
+    table_name = 'account'
+
+    def create_account_table(self):
+        query = f"""
+        CREATE TABLE IF NOT EXISTS {self.table_name} (
             id BIGSERIAL PRIMARY KEY,
             user_id BIGINT REFERENCES users(id),
             first_name VARCHAR(255),
@@ -23,10 +24,9 @@ class AccountModel:
         execute_query(query)
         return None
 
-    @staticmethod
-    def create_account(first_name, telegram_id, user_id=None, last_name=None, telegram_username=None):
-        query = """
-        INSERT INTO account (user_id, first_name, telegram_id, last_name, telegram_username)
+    def create_account(self, first_name, telegram_id, user_id=None, last_name=None, telegram_username=None):
+        query = f"""
+        INSERT INTO {self.table_name} (user_id, first_name, telegram_id, last_name, telegram_username)
         VALUES (%s, %s, %s, %s, %s)
         RETURNING id;
         """
@@ -34,90 +34,80 @@ class AccountModel:
         user_id = execute_query(query, (user_id, first_name, telegram_id, last_name, telegram_username), fetch='return')
         return user_id  # Returns the user_id if inserted, or None if already exists
 
-    @staticmethod
-    def update_account(account_id, user_id=None, first_name=None, last_name=None, telegram_username=None):
-        query = """
-        UPDATE account
+    def update_account(self, account_id, user_id=None, first_name=None, last_name=None, telegram_username=None):
+        query = f"""
+        UPDATE {self.table_name}
         SET user_id = %s, first_name=%s, last_name=%s, telegram_username=%s, updated_at=NOW()
         WHERE id=%s;
         """
         execute_query(query, (user_id, first_name, last_name, telegram_username, account_id))
         return None
 
-    @staticmethod
-    def add_used(account_id):
-        used = execute_query("SELECT used FROM account WHERE id=%s;", (account_id,), fetch='one')[0]
-        query = """
-        UPDATE account
+    def add_used(self, account_id):
+        used = execute_query(f"SELECT used FROM {self.table_name} WHERE id=%s;", (account_id,), fetch='one')[0]
+        query = f"""
+        UPDATE {self.table_name}
         SET used=%s, updated_at=NOW()
         WHERE id=%s;
         """
         execute_query(query, (int(used)+1, account_id))
         return None
 
-    @staticmethod
-    def delete_account(account_id):
-        query = """
-        UPDATE account
+    def delete_account(self, account_id):
+        query = f"""
+        UPDATE {self.table_name}
         SET deleted_at=NOW(), status=FALSE
         WHERE id=%s;
         """
         execute_query(query, (account_id,))
         return None
 
-    @staticmethod
-    def get_account_by_id(account_id):
-        query = """
-        SELECT * FROM account
+    def get_account_by_id(self, account_id):
+        query = f"""
+        SELECT * FROM {self.table_name}
         WHERE id=%s AND status=TRUE AND deleted_at IS NULL;
         """
         return execute_query(query, (account_id,), fetch='one')
 
-    @staticmethod
-    def get_account_by_telegram_id(telegram_id):
-        query = """
-        SELECT * FROM account
+    def get_account_by_telegram_id(self, telegram_id):
+        query = f"""
+        SELECT * FROM {self.table_name}
         WHERE telegram_id=%s AND status=TRUE AND deleted_at IS NULL;
         """
         return execute_query(query, (telegram_id,), fetch='one')
 
-    @staticmethod
-    def get_account_by_telegram_username(telegram_username):
-        query = """
-        SELECT * FROM account
+    def get_account_by_telegram_username(self, telegram_username):
+        query = f"""
+        SELECT * FROM {self.table_name}
         WHERE telegram_username=%s AND status=TRUE AND deleted_at IS NULL;
         """
         return execute_query(query, (telegram_username,), fetch='one')
 
-    @staticmethod
-    def get_accounts_by_user_id(user_id):
-        query = """
-        SELECT * FROM account
+    def get_accounts_by_user_id(self, user_id):
+        query = f"""
+        SELECT * FROM {self.table_name}
         WHERE user_id=%s AND status=TRUE AND deleted_at IS NULL;
         """
         return execute_query(query, (user_id,), fetch='all')
 
-    @staticmethod
-    def get_unauthorized_accounts():
-        query = """
-        SELECT * FROM account
+    def get_unauthorized_accounts(self):
+        query = f"""
+        SELECT * FROM {self.table_name}
         WHERE user_id IS NULL AND status=TRUE AND deleted_at IS NULL;
         """
         return execute_query(query, fetch='all')
 
-    @staticmethod
-    def get_all_accounts():
-        query = """
-        SELECT * FROM account
+    def get_all_accounts(self):
+        query = f"""
+        SELECT * FROM {self.table_name}
         WHERE status=TRUE AND deleted_at IS NULL;
         """
         return execute_query(query, fetch='all')
 
-    @staticmethod
-    def is_account_registered(telegram_id):
-        query = """
+    def is_account_registered(self, telegram_id):
+        query = f"""
         SELECT *
-        FROM account
+        FROM {self.table_name}
         WHERE telegram_id = %s
         AND status = TRUE
         AND user_id IS NOT NULL
@@ -126,10 +116,9 @@ class AccountModel:
         """
         return True if execute_query(query, (telegram_id,), fetch='one') else False
 
-    @staticmethod
-    def logout(telegram_id):
-        query = """
-        UPDATE account
+    def logout(self, telegram_id):
+        query = f"""
+        UPDATE {self.table_name}
         SET is_logout = TRUE
         WHERE telegram_id = %s
         AND status = TRUE
@@ -139,10 +128,9 @@ class AccountModel:
         execute_query(query, (telegram_id,))
         return None
 
-    @staticmethod
-    def update_logout_status(telegram_id):
-        query = """
-        UPDATE account
+    def update_logout_status(self, telegram_id):
+        query = f"""
+        UPDATE {self.table_name}
         SET is_logout = FALSE
         WHERE telegram_id = %s
         AND status = TRUE
@@ -152,11 +140,20 @@ class AccountModel:
         execute_query(query, (telegram_id,))
         return None
 
-    @staticmethod
-    def get_all_accounts_by_days(start_date, end_date):
-        query = """
-        SELECT * FROM account
+    def get_all_accounts_by_days(self, start_date, end_date):
+        query = f"""
+        SELECT * FROM {self.table_name}
         WHERE created_at BETWEEN %s AND %s
+        AND status = TRUE
+        AND deleted_at IS NULL;
+        """
+        return execute_query(query, (start_date, end_date), fetch='all')
+
+    def get_active_accounts_by_days(self, start_date, end_date):
+        query = f"""
+        SELECT * FROM {self.table_name}
+        WHERE updated_at BETWEEN %s AND %s
+        AND is_logout = FALSE
         AND status = TRUE
         AND deleted_at IS NULL;
         """

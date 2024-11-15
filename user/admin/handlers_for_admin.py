@@ -43,7 +43,14 @@ async def user_management(call: types.CallbackQuery):
 @router_for_admin.callback_query(F.data == 'movies_management')
 async def movies_management(call: types.CallbackQuery=None, message: types.Message=None, state: FSMContext=None,
                             delete=True):
-    await my_validator(message=call.message, user=call.from_user)
+    if message:
+        mess = message
+        user = message.from_user
+
+    else:
+        mess = call.message
+        user = call.from_user
+    await my_validator(message=mess, user=user)
     try:
         if state:
             await state.clear()

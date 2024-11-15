@@ -2,9 +2,10 @@ from database_config.db_settings import execute_query
 
 
 class HiddenHistoryModel:
+    table_name = "hidden_history"
     def create_hidden_history_table(self):
-        query = """
-        CREATE TABLE IF NOT EXISTS hidden_history (
+        query = f"""
+        CREATE TABLE IF NOT EXISTS {self.table_name} (
             id BIGSERIAL PRIMARY KEY,
             account_id BIGINT REFERENCES account(id),
             message_id TEXT,
@@ -15,22 +16,22 @@ class HiddenHistoryModel:
         return None
 
     def create_hidden_history(self, account_id, message_id, text=None):
-        query = """
-        INSERT INTO hidden_history (account_id, message_id, text)
+        query = f"""
+        INSERT INTO {self.table_name} (account_id, message_id, text)
         VALUES (%s, %s, %s);
         """
         execute_query(query, (account_id, message_id, text))
         return None
 
     def get_hidden_histories_by_account_id(self, account_id):
-        query = """
-        SELECT * FROM hidden_history
+        query = f"""
+        SELECT * FROM {self.table_name}
         WHERE account_id = %s;
         """
         return execute_query(query, (account_id,), fetch='all')
 
     def get_all_hidden_histories(self):
-        query = """
-        SELECT * FROM hidden_history;
+        query = f"""
+        SELECT * FROM {self.table_name};
         """
         return execute_query(query, fetch='all')

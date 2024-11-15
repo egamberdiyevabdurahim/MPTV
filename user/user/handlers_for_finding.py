@@ -13,7 +13,7 @@ from queries.for_movie_company import MovieCompanyModel
 from queries.for_movie_genre import MovieGenreModel
 from queries.for_user import UserModel
 from states.for_user import MovieFromCodeState
-from user.others.handlers_for_others import back_to_main
+from utils.for_circular import circular2
 
 router_for_finding = Router()
 
@@ -30,24 +30,27 @@ movie_company_model = MovieCompanyModel()
 
 
 @router_for_finding.callback_query(F.data == "movie_from_code")
-async def movie_from_code(call: types.CallbackQuery, state: FSMContext):
-    await call.answer()
-    await call.message.delete()
-    await call.message.answer("Kino kodini kiriting:", reply_markup=back_button)
+async def movie_from_code(call: types.CallbackQuery, state: FSMContext, answer=True):
+    if answer:
+        await call.answer()
+        await call.message.delete()
+        await call.message.answer("Kino kodini kiriting:", reply_markup=back_button)
     await state.set_state(MovieFromCodeState.code)
 
 
 @router_for_finding.message(MovieFromCodeState.code)
-async def movie_from_code_code(message: types.Message, state: FSMContext):
-    if message.text is None:
+async def movie_from_code_code(message: types.Message, state: FSMContext, code=None):
+    if not code:
+        code = message.text
+    if code is None:
         await message.answer("Kod formati xato!", reply_markup=back_button)
         return
 
-    if not message.text.isnumeric():
+    if not code.isnumeric():
         await message.answer("Kod formati xato!", reply_markup=back_button)
         return
 
-    movie_code = message.text.strip()
+    movie_code = code.strip()
     movie = movie_model.get_movie_by_code(code=movie_code)
     if movie is None:
         await message.answer("Bunday kino topilmadi!", reply_markup=back_button)
@@ -124,25 +127,30 @@ async def movie_from_code_quality(call: types.CallbackQuery, state: FSMContext):
 
     # Send the video with caption
     movie_model.add_view_count(movie_id=movie_id)
-    await call.message.answer_video(
-        video=video_quality,
-        caption=(f"#{category_model.get_category_by_id(category_id)['name']}\n"
-                 f"🔎 Kodi: {code}\n"
-                 f"🎥 Nomi: {title}\n"
-                 f"📅 Yili: {release_date}\n"
-                 f"⏳ Davomiyligi: {duration} daqiqa\n"
-                 f"🎞 Studiya: {companies}\n"
-                 f"{language_name[:2]} Tili: #{language_name[2:]}\n"
-                 f"🌏 Davlati: #{country_name}\n"
-                 f"💾 Sifati: #{quality}p\n"
-                 f"🎭 Janri: {genres}\n"
-                 f"👁‍ Ko'rilgan: {views_count} | ❤️ Yoqtirilganlar: {movie_model.get_likes_count(movie_id=movie_id)}"),
-        parse_mode="HTML",
-        reply_markup=await watch_movie_menu(
-            user_id=user.get('id') if user else None,
-            movie_id=movie_id,
-        )
+    caption = (
+        f"#{category_model.get_category_by_id(category_id)['name']}\n"
+        f"🔎 Kodi: {code}\n"
+        f"🎥 Nomi: {title}\n"
+        f"📅 Yili: {release_date}\n"
+        f"⏳ Davomiyligi: {duration} daqiqa\n"
+        f"🎞 Studiya: {companies}\n"
+        f"{language_name[:2]} Tili: #{language_name[2:]}\n"
+        f"🌏 Davlati: #{country_name}\n"
+        f"💾 Sifati: {quality}p\n"
+        f"🎭 Janri: {genres}\n\n"
+        f"👁‍ Ko'rilgan: {views_count} | ❤️ Yoqtirilganlar: {movie_model.get_likes_count(movie_id)}\n\n"
+        f"--◆--◆--◆--◆--◆--◆--◆--◆--\n\n"
+        f"✅ Barchasi bizda - [MPTV](https://t.me/mp_tv_uz)\n\n"
+        f"▶️ [YouTube](https://www.youtube.com/channel/YourChannelLink) | "
+        f"📸 [Instagram](https://www.instagram.com/YourInstagramHandle) | "
+        f"🛩️ [Telegram](https://t.me/mp_tv_uz)"
     )
+
+    await call.message.answer_video(video=video_quality, caption=caption, parse_mode="Markdown",
+                                    reply_markup=await watch_movie_menu(
+                                        user_id=user.get('id') if user else None,
+                                        movie_id=movie_id,
+                                    ))
+
     await state.clear()
-    if not state_data.get("from_callback"):
-        await back_to_main(call=call, state=state, delete=False)
+    await circular2(message=call.message, user=call.from_user, state=state, delete=False)

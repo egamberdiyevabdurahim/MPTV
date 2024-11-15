@@ -2,9 +2,10 @@ from database_config.db_settings import execute_query
 
 
 class SavedModel:
+    table_name = "saved"
     def create_saved_table(self):
-        query = """
-        CREATE TABLE IF NOT EXISTS saved (
+        query = f"""
+        CREATE TABLE IF NOT EXISTS {self.table_name} (
             id BIGSERIAL PRIMARY KEY,
             user_id BIGINT REFERENCES users(id),
             movie_id BIGINT REFERENCES movie(id),
@@ -14,8 +15,8 @@ class SavedModel:
         return None
 
     def create_saved(self, user_id, movie_id):
-        query = """
-        INSERT INTO saved (user_id, movie_id)
+        query = f"""
+        INSERT INTO {self.table_name} (user_id, movie_id)
         VALUES (%s, %s)
         RETURNING id;
         """
@@ -23,18 +24,18 @@ class SavedModel:
         return result
 
     def delete_saved(self, user_id, movie_id):
-        query = "DELETE FROM saved WHERE user_id=%s AND movie_id=%s"
+        query = f"DELETE FROM {self.table_name} WHERE user_id=%s AND movie_id=%s"
         execute_query(query, (user_id, movie_id))
         return None
 
     def get_saved_movies_by_user_id(self, user_id):
-        query = "SELECT * FROM saved WHERE user_id=%s"
+        query = f"SELECT * FROM {self.table_name} WHERE user_id=%s"
         return execute_query(query, (user_id,), fetch='all')
 
     def get_all_saved(self):
-        query = "SELECT * FROM saved"
+        query = f"SELECT * FROM {self.table_name}"
         return execute_query(query, fetch='all')
 
     def get_saved_by_user_id_and_movie_id(self, user_id, movie_id):
-        query = "SELECT * FROM saved WHERE user_id=%s AND movie_id=%s"
+        query = f"SELECT * FROM {self.table_name} WHERE user_id=%s AND movie_id=%s"
         return execute_query(query, (user_id, movie_id), fetch='one')

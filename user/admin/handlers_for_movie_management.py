@@ -397,16 +397,24 @@ async def add_movie_1080p(message: types.Message, state: FSMContext):
         qualities += "#1080p "
 
     await message.answer(f"Film saqlandi! Film ID: {movie['id']}")
-    await message.answer(f"#{category_model.get_category_by_id(category_id)['name']}\n"
-                         f"🔎 Kodi: {code}\n"
-                         f"🎥 Nomi: {title}\n"
-                         f"📅 Yili: {release_date}\n"
-                         f"⏳ Davomiyligi: {duration} daqiqa\n"
-                         f"🎞 Studiya: {companies}\n"
-                         f"{language_name[:2]} Tili: #{language_name[2:]}\n"
-                         f"🌏 Davlati: #{country_name}\n"
-                         f"💾 Sifati: {qualities}\n"
-                         f"🎭 Janri: {genres}")
+    await message.answer(
+        text=f"#{category_model.get_category_by_id(category_id)['name']}\n"
+             f"🔎 Kodi: {code}\n"
+             f"🎥 Nomi: {title}\n"
+             f"📅 Yili: {release_date}\n"
+             f"⏳ Davomiyligi: {duration} daqiqa\n"
+             f"🎞 Studiya: {companies}\n"
+             f"{language_name[:2]} Tili: #{language_name[2:]}\n"
+             f"🌏 Davlati: #{country_name}\n"
+             f"💾 Sifati: {qualities}\n"
+             f"🎭 Janri: {genres}\n\n"
+             f"--◆--◆--◆--◆--◆--◆--◆--◆--\n\n"
+             f"✅ Barchasi bizda - [MPTV](https://t.me/mp_tv_uz)\n\n"
+             f"[▶️YouTube](https://www.youtube.com/@mp_tv_uz) | "
+             f"[📷Instagram](https://www.instagram.com/mp_tv_uz) | [🛩️Telegram](https://t.me/mp_tv_uz)",
+        parse_mode="Markdown"
+    )
+
     await movies_management(message=message, state=state)
 
 

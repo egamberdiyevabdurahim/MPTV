@@ -66,3 +66,9 @@ class AddMovie(StatesGroup):
 class DeleteMovie(StatesGroup):
     code = State()
     validate = State()
+
+
+# SENDING MESSAGE
+class SendingMessageAdmin(StatesGroup):
+    message = State()
+    photo = State()

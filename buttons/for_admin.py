@@ -10,6 +10,8 @@ main_menu_admin = InlineKeyboardMarkup(inline_keyboard=[
 admin_panel_menu = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="Userlar Boshqaruvi", callback_data="user_management")],
     [InlineKeyboardButton(text="Kino yoki Multfilm Boshqaruvi(Asosiy)", callback_data="movies_management")],
+    [InlineKeyboardButton(text="Statistics", callback_data="statistics_admin")],
+    [InlineKeyboardButton(text="Xabar Jo'natiash", callback_data="send_message")],
     [InlineKeyboardButton(text="Ortga", callback_data="back_to_main")],
 ])
 
@@ -79,6 +81,7 @@ category_management_menu = InlineKeyboardMarkup(inline_keyboard=[
     [InlineKeyboardButton(text="Barcha Categoriyalarni Ko'rish", callback_data="show_all_categories")],
     [InlineKeyboardButton(text="Ortga", callback_data="back_to_movies")],
 ])
+
 
 skip_menu = ReplyKeyboardMarkup(keyboard=[
     [KeyboardButton(text="skip")],],
