@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 from aiogram import types, Router, Bot
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
-from aiogram.types import ReplyKeyboardRemove
 
 from buttons.for_admin import main_menu_admin
 from buttons.for_user import main_menu_auth, main_menu_un_auth
@@ -35,84 +34,46 @@ async def start_command(message: types.Message, user=None, state: FSMContext = N
     if message.text:
         hidden_code = message.text.split(' ')[-1]
         if len(list(message.text.split(' '))) > 1:
+            if not account:
+                user_id = account_model.create_account(
+                    first_name=user.first_name,
+                    telegram_id=user.id,
+                    last_name=user.last_name,
+                    telegram_username=user.username
+                )['id']
             if hidden_code == SocialEnum.INSTAGRAM.value:
                 if not account:
-                    user_id = account_model.create_account(
-                        first_name=user.first_name,
-                        telegram_id=user.id,
-                        last_name=user.last_name,
-                        telegram_username=user.username
-                    )
                     SocialUsersModel().create_social_user(user_id=user_id, social_media=SocialEnum.INSTAGRAM.value)
 
             elif hidden_code == SocialEnum.TIKTOK.value:
                 if not account:
-                    user_id = account_model.create_account(
-                        first_name=user.first_name,
-                        telegram_id=user.id,
-                        last_name=user.last_name,
-                        telegram_username=user.username
-                    )
                     SocialUsersModel().create_social_user(user_id=user_id, social_media=SocialEnum.TIKTOK.value)
 
             elif hidden_code == SocialEnum.YOUTUBE.value:
                 if not account:
-                    user_id = account_model.create_account(
-                        first_name=user.first_name,
-                        telegram_id=user.id,
-                        last_name=user.last_name,
-                        telegram_username=user.username
-                    )
                     SocialUsersModel().create_social_user(user_id=user_id, social_media=SocialEnum.YOUTUBE.value)
 
             elif message.text.split(' ')[1] == SocialEnum.INSTAGRAM.value and hidden_code.isnumeric():
                 if not account:
-                    user_id = account_model.create_account(
-                        first_name=user.first_name,
-                        telegram_id=user.id,
-                        last_name=user.last_name,
-                        telegram_username=user.username
-                    )
                     SocialUsersModel().create_social_user(user_id=user_id, social_media=SocialEnum.INSTAGRAM.value)
                 await circular1(message, state, hidden_code)
 
             elif message.text.split(' ')[1] == SocialEnum.TIKTOK.value and hidden_code.isnumeric():
                 if not account:
-                    user_id = account_model.create_account(
-                        first_name=user.first_name,
-                        telegram_id=user.id,
-                        last_name=user.last_name,
-                        telegram_username=user.username
-                    )
                     SocialUsersModel().create_social_user(user_id=user_id, social_media=SocialEnum.TIKTOK.value)
                 await circular1(message, state, hidden_code)
 
             elif message.text.split(' ')[1] == SocialEnum.YOUTUBE.value and hidden_code.isnumeric():
                 if not account:
-                    user_id = account_model.create_account(
-                        first_name=user.first_name,
-                        telegram_id=user.id,
-                        last_name=user.last_name,
-                        telegram_username=user.username
-                    )
                     SocialUsersModel().create_social_user(user_id=user_id, social_media=SocialEnum.YOUTUBE.value)
                 await circular1(message, state, hidden_code)
 
             elif hidden_code.isnumeric():
-                if not account:
-                    account_model.create_account(
-                        first_name=user.first_name,
-                        telegram_id=user.id,
-                        last_name=user.last_name,
-                        telegram_username=user.username
-                    )
                 await circular1(message, state, hidden_code)
 
-    # Check if user is registered
     user = user if user else message.from_user
     is_auth = account_model.is_account_registered(telegram_id=user.id)
 
-    # Send welcome message with appropriate menu
     if is_auth:
         await message.answer(
             f"Assalamu Aleykum\n{user.first_name}, Botimizga Xush Kelibsiz😊!\n\n"

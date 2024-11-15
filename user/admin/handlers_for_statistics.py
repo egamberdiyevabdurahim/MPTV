@@ -1,11 +1,10 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 from aiogram import Router, types, F
 
 from main import start_command
 from queries.for_account import AccountModel
 from queries.for_social_users import SocialUsersModel, SocialEnum
-from utils.additions import tashkent_time
 from utils.validator import my_validator
 
 router_for_statistics = Router()
@@ -20,59 +19,59 @@ async def statistics_admin(call: types.CallbackQuery):
     await call.answer()
     await call.message.delete()
     data = ""
-    active_accounts_on_30 = account_model.get_active_accounts_by_days(tashkent_time-timedelta(days=30), tashkent_time)
-    active_accounts_on_7 = account_model.get_active_accounts_by_days(tashkent_time - timedelta(days=7), tashkent_time)
-    active_accounts_on_1 = account_model.get_active_accounts_by_days(tashkent_time - timedelta(days=1), tashkent_time)
+    active_accounts_on_30 = account_model.get_active_accounts_by_days(datetime.now()-timedelta(days=30), datetime.now())
+    active_accounts_on_7 = account_model.get_active_accounts_by_days(datetime.now() - timedelta(days=7), datetime.now())
+    active_accounts_on_1 = account_model.get_active_accounts_by_days(datetime.now() - timedelta(days=1), datetime.now())
 
     instagram_statistics = social_users_model.get_all_social_users_by_social_media(SocialEnum.INSTAGRAM.value)
     instagram_statistics_on_30 = social_users_model.get_socials_by_days(
         social_media=SocialEnum.INSTAGRAM.value,
-        start_date=tashkent_time - timedelta(days=30),
-        end_date=tashkent_time
+        start_date=datetime.now() - timedelta(days=30),
+        end_date=datetime.now()
     )
     instagram_statistics_on_7 = social_users_model.get_socials_by_days(
         social_media=SocialEnum.INSTAGRAM.value,
-        start_date=tashkent_time - timedelta(days=7),
-        end_date=tashkent_time
+        start_date=datetime.now() - timedelta(days=7),
+        end_date=datetime.now()
     )
     instagram_statistics_on_1 = social_users_model.get_socials_by_days(
         social_media=SocialEnum.INSTAGRAM.value,
-        start_date=tashkent_time - timedelta(days=1),
-        end_date=tashkent_time
+        start_date=datetime.now() - timedelta(days=1),
+        end_date=datetime.now()
     )
 
     youtube_statistics = social_users_model.get_all_social_users_by_social_media(SocialEnum.YOUTUBE.value)
     youtube_statistics_on_30 = social_users_model.get_socials_by_days(
         social_media=SocialEnum.YOUTUBE.value,
-        start_date=tashkent_time - timedelta(days=30),
-        end_date=tashkent_time
+        start_date=datetime.now() - timedelta(days=30),
+        end_date=datetime.now()
     )
     youtube_statistics_on_7 = social_users_model.get_socials_by_days(
         social_media=SocialEnum.YOUTUBE.value,
-        start_date=tashkent_time - timedelta(days=7),
-        end_date=tashkent_time
+        start_date=datetime.now() - timedelta(days=7),
+        end_date=datetime.now()
     )
     youtube_statistics_on_1 = social_users_model.get_socials_by_days(
         social_media=SocialEnum.YOUTUBE.value,
-        start_date=tashkent_time - timedelta(days=1),
-        end_date=tashkent_time
+        start_date=datetime.now() - timedelta(days=1),
+        end_date=datetime.now()
     )
 
     tiktok_statistics = social_users_model.get_all_social_users_by_social_media(SocialEnum.TIKTOK.value)
     tiktok_statistics_on_30 = social_users_model.get_socials_by_days(
         social_media=SocialEnum.TIKTOK.value,
-        start_date=tashkent_time - timedelta(days=30),
-        end_date=tashkent_time
+        start_date=datetime.now() - timedelta(days=30),
+        end_date=datetime.now()
     )
     tiktok_statistics_on_7 = social_users_model.get_socials_by_days(
         social_media=SocialEnum.TIKTOK.value,
-        start_date=tashkent_time - timedelta(days=7),
-        end_date=tashkent_time
+        start_date=datetime.now() - timedelta(days=7),
+        end_date=datetime.now()
     )
     tiktok_statistics_on_1 = social_users_model.get_socials_by_days(
         social_media=SocialEnum.TIKTOK.value,
-        start_date=tashkent_time - timedelta(days=1),
-        end_date=tashkent_time
+        start_date=datetime.now() - timedelta(days=1),
+        end_date=datetime.now()
     )
 
     if not active_accounts_on_30:
@@ -94,7 +93,7 @@ async def statistics_admin(call: types.CallbackQuery):
     if not instagram_statistics:
         data += "Instagramda Kelgan Userlar Mavjud Emas\n"
     else:
-        data += f"Instagramda Kelgan Userlar: {len(instagram_statistics)}"
+        data += f"Instagramda Kelgan Userlar: {len(instagram_statistics)}\n"
 
     if not instagram_statistics_on_30:
         data += "30 Kun Ichidagi Instagramda Kelgan Userlar Mavjud Emas\n"
@@ -114,7 +113,7 @@ async def statistics_admin(call: types.CallbackQuery):
     if not youtube_statistics:
         data += "Youtubeda Kelgan Userlar Mavjud Emas\n"
     else:
-        data += f"Youtubeda Kelgan Userlar: {len(youtube_statistics)}"
+        data += f"Youtubeda Kelgan Userlar: {len(youtube_statistics)}\n"
 
     if not youtube_statistics_on_30:
         data += "30 Kun Ichidagi Youtubeda Kelgan Userlar Mavjud Emas\n"
@@ -134,7 +133,7 @@ async def statistics_admin(call: types.CallbackQuery):
     if not tiktok_statistics:
         data += "TikTokda Kelgan Userlar Mavjud Emas\n"
     else:
-        data += f"TikTokda Kelgan Userlar: {len(tiktok_statistics)}"
+        data += f"TikTokda Kelgan Userlar: {len(tiktok_statistics)}\n"
 
     if not tiktok_statistics_on_30:
         data += "30 Kun Ichidagi TikTokda Kelgan Userlar Mavjud Emas\n"

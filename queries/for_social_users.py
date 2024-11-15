@@ -15,7 +15,7 @@ class SocialUsersModel:
         query = f"""
         CREATE TABLE IF NOT EXISTS {self.table_name} (
             id BIGSERIAL PRIMARY KEY,
-            user_id BIGINT REFERENCES users(id),
+            user_id BIGINT REFERENCES account(id),
             social_media VARCHAR(255) NOT NULL,
             created_at TIMESTAMPTZ DEFAULT NOW()
         )"""
@@ -28,7 +28,7 @@ class SocialUsersModel:
         VALUES (%s, %s)
         RETURNING id;
         """
-        result = execute_query(query, (user_id, social_media.value), fetch='return')
+        result = execute_query(query, (user_id, social_media), fetch='return')
         return result
 
     def get_all_social_users_by_social_media(self, social_media):
